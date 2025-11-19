@@ -1,11 +1,15 @@
-import NextAuth from "next-auth"
+import { NextResponse } from "next/server"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import NextAuth from "next-auth"
 
 const prisma = new PrismaClient()
 
-const handler = NextAuth({
+console.log("DEBUG: NEXTAUTH_URL", process.env.NEXTAUTH_URL)
+console.log("DEBUG: NEXTAUTH_SECRET", process.env.NEXTAUTH_SECRET ? "Set" : "Not Set")
+
+export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -23,15 +27,7 @@ const handler = NextAuth({
                 })
 
                 if (!user) {
-                    // For demo purposes, auto-register if user doesn't exist
-                    const hashedPassword = await bcrypt.hash(credentials.password, 10)
-                    const newUser = await prisma.user.create({
-                        data: {
-                            username: credentials.username,
-                            password: hashedPassword
-                        }
-                    })
-                    return { id: newUser.id, name: newUser.username }
+                    return null
                 }
 
                 const isPasswordValid = await bcrypt.compare(credentials.password, user.password)
@@ -56,6 +52,8 @@ const handler = NextAuth({
             return session
         }
     }
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

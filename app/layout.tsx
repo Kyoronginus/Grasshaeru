@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Grasshaeru",
-  description: "Artistic task management with version control",
+  description: "task management tool",
 };
 
 export default function RootLayout({
